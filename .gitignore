@@ -1,0 +1,8 @@
+server/.DS_Store
+server/__pycache__
+server/venv
+server/uploads
+frontend/node_modules
+frontend/static/js
+frontend/.DS_Store
+**/.DS_Store
