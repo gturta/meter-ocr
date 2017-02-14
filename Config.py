@@ -1,6 +1,7 @@
 
 class Config:
     DEBUG=True
+    DEBUG_FOLDER='Debug'
     DIGIT_MIN_HEIGHT=15
     DIGIT_MAX_HEIGHT=100
     DIGIT_W_H_MIN_RATIO=.20

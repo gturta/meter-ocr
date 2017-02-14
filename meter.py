@@ -16,8 +16,8 @@ def loadImage(fileName):
 
 if __name__=="__main__":
     img=loadImage(sys.argv[1])
-    proc = ImagePreprocessor(img,CFG.DEBUG)
-    ex=Extractor(proc.image,CFG.DEBUG)
+    proc = ImagePreprocessor(img)
+    ex=Extractor(proc.image)
     ex.process()
     ocr = DigitOCR()
     ocr.train()

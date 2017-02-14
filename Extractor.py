@@ -1,11 +1,12 @@
 import sys
 import cv2
 import numpy as np
+from os import path
 from Config import Config as CFG
 from ImageProcess import ImagePreprocessor
 
 class Extractor:
-    def __init__(self,image,debug=False):
+    def __init__(self,image):
         self.image = image
 
     def process(self):
@@ -185,24 +186,24 @@ class Extractor:
                 cv2.rectangle(copy,r[0],r[1],(255,0,0),3)
             for b in self.redBands:
                 cv2.rectangle(copy,b[0],b[1],(0,255,0),3)
-            cv2.imwrite('debug-extract-boxes.jpg',copy)
+            cv2.imwrite(path.join(CFG.DEBUG_FOLDER,'debug-extract-boxes.jpg'),copy)
             for i,r in enumerate(self.redROIs):
                 print("ROI {}: {} digits".format(i,len(self.digitSets[i])))
                 copy=r.copy()
                 for d in self.digitSets[i]:
                     cv2.rectangle(copy,d[0],d[1],255,1)
-                cv2.imwrite('debug-extract-roi-{}.jpg'.format(i),copy)
+                cv2.imwrite(path.join(CFG.DEBUG_FOLDER,'debug-extract-roi-{}.jpg'.format(i)),copy)
             print("Found ROI {} with confidence {}".format(
                 self.foundIndex,self.foundConfidence))
             for i,d in enumerate(self.foundDigits):
                 print("Digit {} is {}".format(i,d))
                 dr = self.getDigitROI(i)
                 if dr is not None:
-                    cv2.imwrite("debug-extract-d{}.jpg".format(i),dr)
+                    cv2.imwrite(path.join(CFG.DEBUG_FOLDER,"debug-extract-d{}.jpg".format(i)),dr)
 
 if __name__=="__main__":
     img = cv2.imread(sys.argv[1])
-    proc = ImagePreprocessor(img,CFG.DEBUG)
-    ex=Extractor(proc.image,CFG.DEBUG)
+    proc = ImagePreprocessor(img)
+    ex=Extractor(proc.image)
     ex.process()
 
