@@ -1,25 +1,39 @@
 import cv2
 import numpy as np
 import sys
-from Config import Config as CFG
-from ImageProcess import ImagePreprocessor
-from Extractor import Extractor
-from OCR import DigitOCR
+from os import path
+from . import Config as CFG
+from .ImageProcess import ImagePreprocessor
+from .Extractor import Extractor
+from .OCR import DigitOCR
 
-def loadImage(fileName):
-    img=cv2.imread(fileName)
-    if img is None:
-        exit("Invalid image")
-    if CFG.DEBUG:
-        print("Image shape: {}".format(img.shape))
-    return img
+
+class MeterOCR:
+    def __init__(self, image, folder='.', debug=False):
+        self.folder=folder
+        self.imgName=image
+        self.filename=path.join(self.folder, self.imgName)
+        self.debug=debug
+
+    def loadImage(self, fileName):
+        img=cv2.imread(fileName)
+        if img is None:
+            exit("Invalid image")
+        if self.debug:
+            print("Image shape: {}".format(img.shape))
+        return img
+
+    def process(self):
+        self.image = self.loadImage(self.filename)
+        preprocess = ImagePreprocessor(self.image, self.folder, debug=True)
+        extractor = Extractor(preprocess.image, self.folder, debug=True)
+        extractor.process()
+        ocr = DigitOCR()
+        ocr.train()
+        res = ocr.identify(extractor.digits)
+        return res
 
 if __name__=="__main__":
-    img=loadImage(sys.argv[1])
-    proc = ImagePreprocessor(img)
-    ex=Extractor(proc.image)
-    ex.process()
-    ocr = DigitOCR()
-    ocr.train()
-    res = ocr.identify(ex.digits)
+    mocr = MeterOCR(sys.argv[1])
+    res = mocr.process()
     print(res)

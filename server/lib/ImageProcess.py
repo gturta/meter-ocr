@@ -1,11 +1,13 @@
 import cv2
 import numpy as np
 from os import path
-from Config import Config as CFG
+from .Config import Config as CFG
 
 class ImagePreprocessor:
-    def __init__(self,img):
-        self.original = img
+    def __init__(self, image, folder='.', debug=False):
+        self.original = image
+        self.folder=folder
+        self.debug=debug
         self.__skew = None
         self.__image = None
         self.__horizLines = None
@@ -50,7 +52,7 @@ class ImagePreprocessor:
         if lines is None:
             print("No HoughLines detected, cannot adjust level")
             return 0.0
-        if CFG.DEBUG:
+        if self.debug:
             print("HoughLines detected {} lines".format(len(lines)))
         #find horizontal lines and their angle average
         horizLines = []
@@ -85,7 +87,7 @@ class ImagePreprocessor:
                                     interpolation = cv2.INTER_CUBIC)
 
     def DebugDump(self):
-        if CFG.DEBUG:
+        if self.debug:
             print("Average rotation angle from {} horiz lines: {}"
                   .format(len(self.__horizLines),self.__skew))
             #debug write image with detected horiz lines
@@ -98,5 +100,5 @@ class ImagePreprocessor:
                 x2 = int(x0 - 1000*(-b))
                 y2 = int(y0 - 1000*(a))
                 cv2.line(copy,(x1,y1),(x2,y2),(255,0,0),2)
-            cv2.imwrite(path.join(CFG.DEBUG_FOLDER,'debug-process-lines.jpg'),copy)
+            cv2.imwrite(path.join(self.folder,'debug-process-lines.jpg'),copy)
 

@@ -1,0 +1,86 @@
+.output-panel{
+    .panel;
+    .panel-default;
+    .output-panel-heading{
+        .panel-heading;
+        .output-panel-title{
+            .panel-title;
+        }
+    }
+    .output-panel-body{
+        .panel-body;
+        .trainer-output-result{
+            .make-row();
+            border-bottom: 1px solid gray;
+            .result-input{
+                .make-sm-column(3);
+                .result-input-name{
+                    .make-sm-column(12);
+                }
+                .result-input-image{
+                    .make-sm-column(12);
+                    img{
+                        .img-responsive;
+			            max-height: 300px;
+                    }
+                }
+                .result-input-reload{
+                    .make-sm-column(12);
+                    button{
+			            width: 50px;
+			            height: 50px;
+                        background: url('/img/img-reload.svg');
+			            background-repeat: no-repeat;
+			            background-size: 100%;
+                    }
+                }
+            }
+            .result-output{
+                .make-sm-column(9);
+                .result-output-band{
+                    .make-row();
+                    img{
+                        .img-responsive;
+            			height: 50px;
+                    }
+                }
+                .result-output-digits{
+                    .result-output-digit{
+                        .make-row();
+                        margin-top: 5px;
+                        border: 1px solid gray;
+                        .digit-img{
+                            .make-sm-column(2);
+			                img{
+                                .img-responsive;
+                                height: 50px;
+			                }
+                        }
+                        .digit-ocr{
+                            .make-sm-column(1);
+                            height: 50px;
+                        }
+                        .digit-train-value{
+                            .make-sm-column(1);
+                            height:50px;
+				            input{
+				                width: 100%;
+				            }
+                        }
+                        .digit-train-submit{
+                            .make-sm-column(1);
+                            button{
+                                height:40px;
+                                width: 40px;
+                                background: url('/img/img-right-arrow.svg');
+			                    background-repeat: no-repeat;
+			                    background-size: 100%;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+

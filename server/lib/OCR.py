@@ -19,10 +19,15 @@ class DigitOCR:
             self.knn.train(train, cv2.ml.ROW_SAMPLE, train_labels)
 
     def identify(self,images):
-        data = np.array([img.reshape(-1).astype(np.float32)\
-                         for img in images])
-        ret,result,neighbours,dist = self.knn.findNearest(data,k=5)
-        return result
+        results=[]
+        for img in images:
+            if img is not None:
+                img=img.reshape(-1,450).astype(np.float32)
+                ret,result,neighbours,dist = self.knn.findNearest(img,k=5)
+                results.append([ret,result,neighbours,dist])
+            else:
+                results.append([None,None,None,None])
+        return results
 
     def generateTrainFile(self):
         libIndex=path.join(self.trainLibrary,self.trainIndex)

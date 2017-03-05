@@ -2,12 +2,14 @@ import sys
 import cv2
 import numpy as np
 from os import path
-from Config import Config as CFG
-from ImageProcess import ImagePreprocessor
+from .Config import Config as CFG
+from .ImageProcess import ImagePreprocessor
 
 class Extractor:
-    def __init__(self,image):
+    def __init__(self,image,folder='.', debug=False):
         self.image = image
+        self.folder=folder
+        self.debug=debug
 
     def process(self):
         #the decimals are surrounded by a red box, so find it
@@ -44,7 +46,7 @@ class Extractor:
         return digitROI
 
     def findRedBoxes(self):
-        img = self.image
+        img = self.image.copy()
         hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
         #red color in HSV space: 0-10 & 160-179
         redmask1=cv2.inRange(hsv,(0,100,100),(10,255,255))
@@ -76,14 +78,16 @@ class Extractor:
 
     def getRedROIs(self):
         redROIs=[]
-        for band in self.redBands:
+        for i,band in enumerate(self.redBands):
             roi = self.image[band[0][1]:band[1][1],band[0][0]:band[1][0]]
             #process ROI
             img=cv2.cvtColor(roi,cv2.COLOR_BGR2GRAY)
             height=int(roi.shape[0]/2)*2-1 #needs to be uneven
+            print(height)
             img=cv2.adaptiveThreshold(img,255,\
                                       cv2.ADAPTIVE_THRESH_GAUSSIAN_C,\
-                                        cv2.THRESH_BINARY,height,-40)
+                                        cv2.THRESH_BINARY,height,-20)
+            cv2.imwrite(self.folder+'debug-roii-{}.jpg'.format(i),img)
             #remove noise
             k = int(img.shape[0]*0.05)#one fifth of height
             if k > 1:
@@ -179,27 +183,28 @@ class Extractor:
             d[1] = ( int(d[1][0]+offsetX), int(d[1][1]+offsetY) )
 
     def debugDump(self):
-        if CFG.DEBUG:
+        if self.debug:
             print("Extractor: {} red boxes".format(len(self.redBoxes)))
             copy=self.image.copy()
             for r in self.redBoxes:
                 cv2.rectangle(copy,r[0],r[1],(255,0,0),3)
             for b in self.redBands:
                 cv2.rectangle(copy,b[0],b[1],(0,255,0),3)
-            cv2.imwrite(path.join(CFG.DEBUG_FOLDER,'debug-extract-boxes.jpg'),copy)
+            cv2.imwrite(path.join(self.folder,'debug-extract-boxes.jpg'),copy)
             for i,r in enumerate(self.redROIs):
                 print("ROI {}: {} digits".format(i,len(self.digitSets[i])))
                 copy=r.copy()
                 for d in self.digitSets[i]:
                     cv2.rectangle(copy,d[0],d[1],255,1)
-                cv2.imwrite(path.join(CFG.DEBUG_FOLDER,'debug-extract-roi-{}.jpg'.format(i)),copy)
+                cv2.imwrite(path.join(self.folder,'debug-extract-roi-{}.jpg'.format(i)),copy)
             print("Found ROI {} with confidence {}".format(
                 self.foundIndex,self.foundConfidence))
+            cv2.imwrite(path.join(self.folder,"digitband.jpg"),self.redROIs[self.foundIndex])
             for i,d in enumerate(self.foundDigits):
                 print("Digit {} is {}".format(i,d))
                 dr = self.getDigitROI(i)
                 if dr is not None:
-                    cv2.imwrite(path.join(CFG.DEBUG_FOLDER,"debug-extract-d{}.jpg".format(i)),dr)
+                    cv2.imwrite(path.join(self.folder,"d{}.jpg".format(i)),dr)
 
 if __name__=="__main__":
     img = cv2.imread(sys.argv[1])
